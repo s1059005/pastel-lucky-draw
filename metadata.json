@@ -1,0 +1,5 @@
+{
+  "name": "遊戲時間抽獎機",
+  "description": "一個可愛日系風格的遊戲時間加權抽獎工具，支援自定義期望值與動態動畫。",
+  "requestFramePermissions": []
+}
