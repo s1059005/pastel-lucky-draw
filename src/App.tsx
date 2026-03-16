@@ -18,6 +18,7 @@ import {
   X
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import BallPit from './components/BallPit';
 
 // --- Types ---
 interface DrawResult {
@@ -30,6 +31,8 @@ export default function App() {
   const [minMin, setMinMin] = useState<number>(5);
   const [maxMin, setMaxMin] = useState<number>(15);
   const [numDraws, setNumDraws] = useState<number>(2);
+  const [windForce, setWindForce] = useState<number>(30); // Default to 30 for strong wind
+  const [animDurationSec, setAnimDurationSec] = useState<number>(4); // Default to 4 seconds
   
   // --- UI State ---
   const [isDrawing, setIsDrawing] = useState(false);
@@ -39,6 +42,42 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [showFinalModal, setShowFinalModal] = useState(false);
+
+  // --- Cooldown State ---
+  const [cooldownEndTime, setCooldownEndTime] = useState<number | null>(() => {
+    const saved = localStorage.getItem('cooldownEndTime');
+    if (saved) {
+      const time = parseInt(saved, 10);
+      if (time > Date.now()) return time;
+      localStorage.removeItem('cooldownEndTime');
+    }
+    return null;
+  });
+  const [countdown, setCountdown] = useState<string>('');
+  const [lastTotalMinutes, setLastTotalMinutes] = useState<number | null>(() => {
+    const saved = localStorage.getItem('lastTotalMinutes');
+    return saved ? parseInt(saved, 10) : null;
+  });
+
+  useEffect(() => {
+    if (!cooldownEndTime) return;
+    const updateCountdown = () => {
+      const now = Date.now();
+      const diff = cooldownEndTime - now;
+      if (diff <= 0) {
+        setCooldownEndTime(null);
+        localStorage.removeItem('cooldownEndTime');
+        setCountdown('');
+      } else {
+        const minutes = Math.floor(diff / 60000);
+        const seconds = Math.floor((diff % 60000) / 1000);
+        setCountdown(`${minutes}分 ${seconds.toString().padStart(2, '0')}秒`);
+      }
+    };
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+    return () => clearInterval(interval);
+  }, [cooldownEndTime]);
 
   // --- Validation ---
   const validateParams = useCallback(() => {
@@ -77,39 +116,48 @@ export default function App() {
     setIsDrawing(true);
     setLastDrawResult(null);
 
-    // Animation delay
-    setTimeout(() => {
-      const minutes = Math.floor(Math.random() * (maxMin - minMin + 1)) + minMin;
-      
-      const newResult = { id: accumulatedResults.length + 1, minutes };
-      const updatedResults = [...accumulatedResults, newResult];
-      
-      setAccumulatedResults(updatedResults);
-      setLastDrawResult(minutes);
-      setIsDrawing(false);
-      setCurrentStep(prev => prev + 1);
+    // BallPit triggers the state update when animation ends
+  };
 
-      // Small confetti for each step
-      confetti({
-        particleCount: 40,
-        spread: 50,
-        origin: { y: 0.7 },
-        colors: ['#FFB7B2', '#B5EAD7']
-      });
+  const onAnimationFinished = () => {
+    const minutes = Math.floor(Math.random() * (maxMin - minMin + 1)) + minMin;
+    
+    const newResult = { id: accumulatedResults.length + 1, minutes };
+    const updatedResults = [...accumulatedResults, newResult];
+    
+    setAccumulatedResults(updatedResults);
+    setLastDrawResult(minutes);
+    setIsDrawing(false);
+    setCurrentStep(prev => prev + 1);
 
-      // If finished all n draws
-      if (updatedResults.length === numDraws) {
-        setTimeout(() => {
-          setShowFinalModal(true);
-          confetti({
-            particleCount: 200,
-            spread: 90,
-            origin: { y: 0.5 },
-            colors: ['#FFB7B2', '#FFDAC1', '#E2F0CB', '#B5EAD7', '#C7CEEA']
-          });
-        }, 1000);
-      }
-    }, 2000);
+    // Small confetti for each step
+    confetti({
+      particleCount: 40,
+      spread: 50,
+      origin: { y: 0.7 },
+      colors: ['#FFB7B2', '#B5EAD7']
+    });
+
+    // If finished all n draws
+    if (updatedResults.length === numDraws) {
+      const endTime = Date.now() + 30 * 60 * 1000; // 30 minutes cooldown
+      setCooldownEndTime(endTime);
+      localStorage.setItem('cooldownEndTime', endTime.toString());
+
+      const currentTotal = updatedResults.reduce((acc, curr) => acc + curr.minutes, 0);
+      setLastTotalMinutes(currentTotal);
+      localStorage.setItem('lastTotalMinutes', currentTotal.toString());
+
+      setTimeout(() => {
+        setShowFinalModal(true);
+        confetti({
+          particleCount: 200,
+          spread: 90,
+          origin: { y: 0.5 },
+          colors: ['#FFB7B2', '#FFDAC1', '#E2F0CB', '#B5EAD7', '#C7CEEA']
+        });
+      }, 1000);
+    }
   };
 
   const totalMinutes = accumulatedResults.reduce((acc, curr) => acc + curr.minutes, 0);
@@ -156,23 +204,21 @@ export default function App() {
           <div className="absolute inset-0 bg-pink-200 blur-[120px] opacity-20 rounded-full animate-pulse" />
           
           <motion.div
-            animate={isDrawing ? {
-              rotate: [0, -8, 8, -8, 8, 0],
-              y: [0, -5, 5, -5, 5, 0],
-              scale: [1, 1.1, 1, 1.1, 1]
-            } : {}}
-            transition={{ repeat: isDrawing ? Infinity : 0, duration: 0.25 }}
+            animate={{}}
+            transition={{ repeat: 0 }}
             className="relative z-10"
           >
             <button
               onClick={handleDrawStep}
-              disabled={isDrawing || isFinished}
+              disabled={isDrawing || isFinished || !!cooldownEndTime}
               className={`
                 group relative w-72 h-72 md:w-96 md:h-96 rounded-full 
                 flex flex-col items-center justify-center gap-4
                 transition-all duration-500
                 ${isDrawing 
                   ? 'bg-gradient-to-br from-pink-300 to-pink-400 cursor-not-allowed' 
+                  : cooldownEndTime
+                    ? 'bg-gray-50 cursor-not-allowed border-8 border-gray-200'
                   : isFinished
                     ? 'bg-gray-100 cursor-default border-8 border-gray-200'
                     : 'bg-white hover:bg-pink-50 cursor-pointer shadow-2xl shadow-pink-200/50 border-8 border-pink-100'
@@ -180,11 +226,22 @@ export default function App() {
               `}
             >
               {isDrawing ? (
-                <div className="flex flex-col items-center gap-4">
-                  <Sparkles className="text-white w-20 h-20 animate-spin" />
-                  <span className="text-white font-black text-2xl tracking-widest animate-pulse">
-                    抽取中...
-                  </span>
+                <BallPit 
+                  onAnimationEnd={onAnimationFinished} 
+                  duration={animDurationSec * 1000} 
+                  windForce={windForce}
+                />
+              ) : cooldownEndTime ? (
+                <div className="flex flex-col items-center gap-2">
+                  <Clock className="text-gray-400 w-24 h-24 mb-2" />
+                  <span className="text-gray-500 font-bold text-xl">冷卻中</span>
+                  <span className="text-pink-500 font-black text-3xl md:text-4xl">{countdown}</span>
+                  {lastTotalMinutes !== null && (
+                    <span className="text-blue-500 font-bold mt-1 text-sm bg-blue-50 px-3 py-1 rounded-full border border-blue-100">
+                      上次抽中總計：{lastTotalMinutes} 分鐘
+                    </span>
+                  )}
+                  <span className="text-gray-400 text-sm mt-2">休息一下再繼續吧！</span>
                 </div>
               ) : isFinished ? (
                 <div className="flex flex-col items-center gap-2">
@@ -305,6 +362,32 @@ export default function App() {
                   />
                 </div>
 
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 text-sm font-bold text-gray-500">
+                    <Sparkles size={16} className="text-teal-300" /> 球池風力強度
+                  </label>
+                  <input 
+                    type="number" 
+                    value={windForce}
+                    onChange={(e) => setWindForce(Number(e.target.value))}
+                    className="w-full bg-teal-50 border-2 border-teal-100 rounded-2xl px-5 py-4 focus:outline-none focus:border-teal-300 font-bold text-teal-600 text-lg"
+                  />
+                  <p className="text-xs text-gray-400 mt-1">建議值：10 ~ 50 (強風)</p>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 text-sm font-bold text-gray-500">
+                    <Clock size={16} className="text-indigo-300" /> 動畫長度 (秒)
+                  </label>
+                  <input 
+                    type="number" 
+                    value={animDurationSec}
+                    onChange={(e) => setAnimDurationSec(Number(e.target.value))}
+                    className="w-full bg-indigo-50 border-2 border-indigo-100 rounded-2xl px-5 py-4 focus:outline-none focus:border-indigo-300 font-bold text-indigo-600 text-lg"
+                  />
+                  <p className="text-xs text-gray-400 mt-1">建議值：3 ~ 10 秒</p>
+                </div>
+
 
 
                 {error && (
@@ -387,7 +470,7 @@ export default function App() {
                   onClick={startNewSession}
                   className="w-full bg-gray-100 hover:bg-gray-200 text-gray-600 font-black py-5 rounded-3xl transition-all flex items-center justify-center gap-2"
                 >
-                  <RotateCcw size={20} /> 再次挑戰
+                  <RotateCcw size={20} /> 完成並返回
                 </button>
               </div>
             </motion.div>
