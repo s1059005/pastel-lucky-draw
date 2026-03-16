@@ -31,8 +31,8 @@ export default function App() {
   const [minMin, setMinMin] = useState<number>(5);
   const [maxMin, setMaxMin] = useState<number>(15);
   const [numDraws, setNumDraws] = useState<number>(2);
-  const [windForce, setWindForce] = useState<number>(30); // Default to 30 for strong wind
-  const [animDurationSec, setAnimDurationSec] = useState<number>(4); // Default to 4 seconds
+  const [windForce, setWindForce] = useState<number>(20); // Default to 20 for strong wind
+  const [animDurationSec, setAnimDurationSec] = useState<number>(8); // Default to 8 seconds
   
   // --- UI State ---
   const [isDrawing, setIsDrawing] = useState(false);
