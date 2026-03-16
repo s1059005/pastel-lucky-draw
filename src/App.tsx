@@ -46,6 +46,16 @@ export default function App() {
     return null;
   }, [minMin, maxMin]);
 
+  // --- Auto-hide Popup ---
+  useEffect(() => {
+    if (lastDrawResult !== null) {
+      const timer = setTimeout(() => {
+        setLastDrawResult(null);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [lastDrawResult]);
+
   // --- Handlers ---
   const startNewSession = () => {
     const validationError = validateParams();
