@@ -1,1 +1,107 @@
 @import "tailwindcss";
+
+@theme {
+  --color-tertiary-dim: #66493c;
+  --color-tertiary-container: #fed4c2;
+  --color-surface-container-highest: #e8dcc1;
+  --color-on-tertiary-fixed: #503629;
+  --color-on-secondary-container: #743600;
+  --color-outline: #7e7665;
+  --color-primary-container: #91f78e;
+  --color-surface-variant: #e8dcc1;
+  --color-background: #fff5e5;
+  --color-on-surface-variant: #625b4b;
+  --color-on-primary-fixed-variant: #00691a;
+  --color-secondary-fixed-dim: #ffb381;
+  --color-on-secondary-fixed-variant: #823e00;
+  --color-on-primary-fixed: #00480f;
+  --color-surface-tint: #006b1b;
+  --color-inverse-on-surface: #a59c89;
+  --color-surface-dim: #e0d3b7;
+  --color-primary-fixed-dim: #83e881;
+  --color-error: #b02500;
+  --color-primary-dim: #005d16;
+  --color-on-tertiary-fixed-variant: #6f5143;
+  --color-secondary: #924600;
+  --color-secondary-container: #ffc6a2;
+  --color-primary-fixed: #91f78e;
+  --color-on-background: #342e20;
+  --color-tertiary: #735547;
+  --color-secondary-fixed: #ffc6a2;
+  --color-on-tertiary: #fff0ea;
+  --color-inverse-surface: #120e04;
+  --color-secondary-dim: #803d00;
+  --color-outline-variant: #b5ac99;
+  --color-surface-bright: #fff5e5;
+  --color-surface-container-high: #eee1c8;
+  --color-surface-container-lowest: #ffffff;
+  --color-primary: #006b1b;
+  --color-surface-container: #f3e7cf;
+  --color-error-container: #f95630;
+  --color-inverse-primary: #91f78e;
+  --color-on-surface: #342e20;
+  --color-on-error: #ffefec;
+  --color-surface: #fff5e5;
+  --color-on-primary: #d1ffc8;
+  --color-surface-container-low: #fbf0d9;
+  --color-tertiary-fixed-dim: #efc6b5;
+  --color-on-error-container: #520c00;
+  --color-on-tertiary-container: #65483a;
+  --color-on-primary-container: #005e17;
+  --color-error-dim: #b92902;
+  --color-on-secondary: #fff0e8;
+
+  --font-headline: 'Plus Jakarta Sans', sans-serif;
+  --font-body: 'Be Vietnam Pro', sans-serif;
+  --font-label: 'Plus Jakarta Sans', sans-serif;
+}
+
+@layer components {
+  /* Cute tactile 3D buttons */
+  .tactile-3d-orange {
+      box-shadow: 0 6px 0 0 var(--color-on-secondary-fixed-variant);
+  }
+  .tactile-3d-orange:active:not(:disabled) {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 0 var(--color-on-secondary-fixed-variant);
+  }
+  .tactile-3d-green {
+      box-shadow: 0 6px 0 0 var(--color-on-primary-fixed);
+  }
+  .tactile-3d-green:active:not(:disabled) {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 0 var(--color-on-primary-fixed);
+  }
+  .tactile-3d-purple {
+      box-shadow: 0 6px 0 0 var(--color-on-tertiary-fixed);
+  }
+  .tactile-3d-purple:active:not(:disabled) {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 0 var(--color-on-tertiary-fixed);
+  }
+  .tactile-3d-red {
+      box-shadow: 0 6px 0 0 var(--color-error-dim);
+  }
+  .tactile-3d-red:active:not(:disabled) {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 0 var(--color-error-dim);
+  }
+
+  /* Custom Scrollbar for Settings */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--color-surface-dim);
+    border-radius: 10px;
+  }
+}
+
+@layer utilities {
+  .clip-circle {
+    clip-path: circle(50% at 50% 50%);
+  }
+}

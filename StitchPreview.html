@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-TW"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>遊戲時間抽獎機 - Game Time Draw Machine</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&amp;family=Be_Vietnam_Pro:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "tertiary-dim": "#66493c",
+              "tertiary-container": "#fed4c2",
+              "surface-container-highest": "#e8dcc1",
+              "on-tertiary-fixed": "#503629",
+              "on-secondary-container": "#743600",
+              "outline": "#7e7665",
+              "primary-container": "#91f78e",
+              "surface-variant": "#e8dcc1",
+              "background": "#fff5e5",
+              "on-surface-variant": "#625b4b",
+              "on-primary-fixed-variant": "#00691a",
+              "secondary-fixed-dim": "#ffb381",
+              "on-secondary-fixed-variant": "#823e00",
+              "on-primary-fixed": "#00480f",
+              "surface-tint": "#006b1b",
+              "inverse-on-surface": "#a59c89",
+              "surface-dim": "#e0d3b7",
+              "primary-fixed-dim": "#83e881",
+              "error": "#b02500",
+              "primary-dim": "#005d16",
+              "on-tertiary-fixed-variant": "#6f5143",
+              "secondary": "#924600",
+              "secondary-container": "#ffc6a2",
+              "primary-fixed": "#91f78e",
+              "on-background": "#342e20",
+              "tertiary": "#735547",
+              "secondary-fixed": "#ffc6a2",
+              "on-tertiary": "#fff0ea",
+              "inverse-surface": "#120e04",
+              "secondary-dim": "#803d00",
+              "outline-variant": "#b5ac99",
+              "surface-bright": "#fff5e5",
+              "surface-container-high": "#eee1c8",
+              "surface-container-lowest": "#ffffff",
+              "primary": "#006b1b",
+              "surface-container": "#f3e7cf",
+              "error-container": "#f95630",
+              "inverse-primary": "#91f78e",
+              "on-surface": "#342e20",
+              "on-error": "#ffefec",
+              "surface": "#fff5e5",
+              "on-primary": "#d1ffc8",
+              "surface-container-low": "#fbf0d9",
+              "tertiary-fixed-dim": "#efc6b5",
+              "on-error-container": "#520c00",
+              "on-tertiary-container": "#65483a",
+              "on-primary-container": "#005e17",
+              "error-dim": "#b92902",
+              "on-secondary": "#fff0e8"
+            },
+            fontFamily: {
+              "headline": ["Plus Jakarta Sans"],
+              "body": ["Be_Vietnam_Pro"],
+              "label": ["Plus Jakarta Sans"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .tactile-3d-orange {
+            box-shadow: 0 4px 0 0 #823e00;
+        }
+        .tactile-3d-orange:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 0 #823e00;
+        }
+        .tactile-3d-green {
+            box-shadow: 0 4px 0 0 #00480f;
+        }
+        .tactile-3d-green:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 0 #00480f;
+        }
+        .tactile-3d-purple {
+            box-shadow: 0 4px 0 0 #503629;
+        }
+        .tactile-3d-purple:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 0 #503629;
+        }
+        .tactile-3d-red {
+            box-shadow: 0 4px 0 0 #520c00;
+        }
+        .tactile-3d-red:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 0 #520c00;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body text-on-surface min-h-screen pb-32">
+<!-- Top Navigation Shell -->
+<header class="bg-[#fff5e5] dark:bg-orange-950 shadow-sm w-full top-0 left-0 z-40">
+<div class="flex items-center justify-between px-6 py-4 w-full">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[#924600] dark:text-orange-400 text-3xl" data-icon="videogame_asset">videogame_asset</span>
+<h1 class="font-headline font-bold tracking-tight text-2xl text-[#342e20] dark:text-orange-100">遊戲時間抽獎機</h1>
+</div>
+<div class="hidden md:flex gap-8">
+<a class="font-headline font-bold text-[#924600] hover:opacity-80 transition-opacity" href="#">Game Time</a>
+<a class="font-headline font-bold text-[#342e20] hover:opacity-80 transition-opacity" href="#">History</a>
+<a class="font-headline font-bold text-[#342e20] hover:opacity-80 transition-opacity" href="#">Settings</a>
+</div>
+</div>
+</header>
+<main class="max-w-4xl mx-auto px-6 pt-10">
+<!-- Configuration Display Section -->
+<section class="mb-12 flex flex-col items-center">
+<div class="bg-surface-container-low rounded-full px-8 py-5 flex items-center gap-6 shadow-sm mb-8 max-w-2xl w-full justify-between">
+<p class="text-xl font-headline font-bold text-on-surface">
+                    我有 <span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full">15</span> 分鐘，分成 <span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full">2</span> 次抽
+                </p>
+<button class="tactile-3d-orange bg-secondary text-on-secondary font-headline font-bold px-8 py-3 rounded-full flex items-center gap-2 transition-all">
+<span>🚀 開始</span>
+</button>
+</div>
+</section>
+<!-- Main Draw Interaction Area -->
+<section class="mb-16">
+<div class="relative flex justify-center">
+<!-- Large Draw Button Card -->
+<div class="bg-surface-container-lowest p-12 rounded-xl shadow-xl w-full max-w-md aspect-square flex flex-col items-center justify-center border-4 border-surface-container-highest relative overflow-hidden">
+<div class="absolute inset-0 opacity-10 pointer-events-none" data-alt="Subtle dotted pattern background" style="background-image: radial-gradient(#924600 2px, transparent 2px); background-size: 24px 24px;"></div>
+<button class="w-56 h-56 rounded-full bg-secondary tactile-3d-orange flex flex-col items-center justify-center text-on-secondary group transition-transform active:scale-95">
+<span class="material-symbols-outlined text-7xl mb-2" data-icon="stars" style="font-variation-settings: 'FILL' 1;">stars</span>
+<span class="font-headline font-black text-2xl tracking-widest">點我抽獎</span>
+</button>
+<div class="mt-8 text-center">
+<p class="text-tertiary font-bold">剩餘時間: 15:00</p>
+</div>
+</div>
+<!-- Decorative elements bleeding off edge -->
+<div class="absolute -right-8 top-1/4 hidden lg:block rotate-12">
+<div class="bg-primary-container p-6 rounded-lg shadow-lg">
+<span class="material-symbols-outlined text-on-primary-container text-5xl" data-icon="rocket_launch">rocket_launch</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Tool Actions Row -->
+<section class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
+<button class="tactile-3d-green bg-primary text-on-primary font-headline font-bold py-4 rounded-full flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" data-icon="filter_1">filter_1</span>
+<span>一顆一顆分</span>
+</button>
+<button class="tactile-3d-orange bg-secondary text-on-secondary font-headline font-bold py-4 rounded-full flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" data-icon="auto_awesome">auto_awesome</span>
+<span>自動平均分</span>
+</button>
+<button class="tactile-3d-purple bg-tertiary text-on-tertiary font-headline font-bold py-4 rounded-full flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" data-icon="lightbulb">lightbulb</span>
+<span>提示</span>
+</button>
+<button class="tactile-3d-red bg-error text-on-error font-headline font-bold py-4 rounded-full flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" data-icon="refresh">refresh</span>
+<span>重新開始</span>
+</button>
+</section>
+<!-- Result Piles Area -->
+<section class="mb-20">
+<h2 class="font-headline font-bold text-2xl mb-8 text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary" data-icon="inventory_2">inventory_2</span>
+                抽獎結果
+            </h2>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+<!-- Card 1 -->
+<div class="bg-surface-container-lowest border-2 border-dashed border-tertiary p-8 rounded-lg relative min-h-[160px] flex flex-col justify-between shadow-sm">
+<span class="font-headline font-black text-6xl text-secondary absolute -top-4 -right-4 opacity-20 pointer-events-none">01</span>
+<p class="font-headline font-bold text-tertiary uppercase tracking-wider text-sm">第 1 堆</p>
+<div class="flex items-end justify-center">
+<span class="font-headline font-black text-7xl text-secondary">0</span>
+<span class="mb-2 ml-1 font-bold text-tertiary">分</span>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface-container-lowest border-2 border-dashed border-tertiary p-8 rounded-lg relative min-h-[160px] flex flex-col justify-between shadow-sm">
+<span class="font-headline font-black text-6xl text-secondary absolute -top-4 -right-4 opacity-20 pointer-events-none">02</span>
+<p class="font-headline font-bold text-tertiary uppercase tracking-wider text-sm">第 2 堆</p>
+<div class="flex items-end justify-center">
+<span class="font-headline font-black text-7xl text-secondary">0</span>
+<span class="mb-2 ml-1 font-bold text-tertiary">分</span>
+</div>
+</div>
+<!-- Card 3 (Empty State) -->
+<div class="bg-surface-container-low/50 border-2 border-dashed border-outline-variant p-8 rounded-lg relative min-h-[160px] flex items-center justify-center">
+<span class="material-symbols-outlined text-outline-variant text-4xl" data-icon="add_circle">add_circle</span>
+</div>
+<!-- Card 4 (Empty State) -->
+<div class="bg-surface-container-low/50 border-2 border-dashed border-outline-variant p-8 rounded-lg relative min-h-[160px] flex items-center justify-center">
+<span class="material-symbols-outlined text-outline-variant text-4xl" data-icon="add_circle">add_circle</span>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Shell (Mobile) -->
+<nav class="fixed bottom-0 left-0 right-0 z-50 flex justify-around items-center h-20 max-w-md mx-auto bg-[#fbf0d9]/90 dark:bg-orange-900/80 backdrop-blur-md rounded-full mx-4 mb-6 shadow-xl shadow-[#735547]/10 md:hidden">
+<button class="text-[#735547] dark:text-orange-200 p-3 hover:scale-110 transition-transform active:scale-95 duration-150">
+<span class="material-symbols-outlined text-3xl" data-icon="home">home</span>
+</button>
+<button class="bg-[#ffc6a2] dark:bg-orange-700 text-[#924600] rounded-xl p-3 hover:scale-110 transition-transform active:scale-95 duration-150">
+<span class="material-symbols-outlined text-3xl" data-icon="extension" style="font-variation-settings: 'FILL' 1;">extension</span>
+</button>
+<button class="text-[#735547] dark:text-orange-200 p-3 hover:scale-110 transition-transform active:scale-95 duration-150">
+<span class="material-symbols-outlined text-3xl" data-icon="領取">article</span>
+</button>
+<button class="text-[#735547] dark:text-orange-200 p-3 hover:scale-110 transition-transform active:scale-95 duration-150">
+<span class="material-symbols-outlined text-3xl" data-icon="settings">settings</span>
+</button>
+</nav>
+<!-- Floating Tooltip / Instruction Pill -->
+<div class="fixed bottom-32 left-1/2 -translate-x-1/2 z-40">
+<div class="bg-tertiary text-on-tertiary px-6 py-3 rounded-full shadow-lg flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary-container" data-icon="help">help</span>
+<span class="font-body font-medium text-sm">點擊中間的星星開始抽獎吧！</span>
+</div>
+</div>
+</body></html>
